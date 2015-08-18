@@ -1,0 +1,16 @@
+{
+  "dependencies": {
+    "Microsoft.Composition": "1.0.27",
+    "Moq": "4.2.1402.2112",
+    "System.Collections": "4.0.10-beta-22816",
+    "System.Diagnostics.Debug": "4.0.10-beta-22816",
+    "System.Globalization": "4.0.0-beta-22816",
+    "System.Runtime": "4.0.20-beta-22816",
+    "System.Runtime.Extensions": "4.0.10-beta-22816",
+    "System.Threading": "4.0.10-beta-22816",
+    "xunit": "1.9.2"
+  },
+  "frameworks": {
+    "net46": { }
+  },
+}

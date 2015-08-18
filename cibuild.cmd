@@ -15,9 +15,8 @@ call :Usage && exit /b 1
 call "C:\Program Files (x86)\Microsoft Visual Studio 14.0\Common7\Tools\VsDevCmd.bat"
 
 REM Build the compiler so we can self host it for the full build
-.nuget\NuGet.exe restore .nuget/packages.config -packagesdirectory packages -Config .nuget/NuGet.Config
-.nuget\NuGet.exe restore %RoslynRoot%/build/Toolset.sln -packagesdirectory packages
-.nuget\V3\NuGet.exe restore .nuget/V3/packages.config -packagesdirectory packages -Config .nuget/NuGet.Config
+nuget.exe restore %RoslynRoot%/build/ToolsetPackages/project.json
+nuget.exe restore %RoslynRoot%/build/Toolset.sln
 msbuild /nologo /v:m /m %RoslynRoot%/build/Toolset.sln /p:Configuration=%BuildConfiguration%
 
 mkdir %RoslynRoot%\Binaries\Bootstrap

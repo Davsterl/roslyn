@@ -7,6 +7,7 @@
     <NonShipping>True</NonShipping>
     <Configuration Condition=" '$(Configuration)' == '' ">Debug</Configuration>
     <Platform Condition=" '$(Platform)' == '' ">AnyCPU</Platform>
+    <PlatformTarget>AnyCPU</PlatformTarget>
     <ProjectGuid>{97CC7ABF-7E07-4F3A-947B-8C2D8F916450}</ProjectGuid>
     <OutputType>Exe</OutputType>
     <RootNamespace>FakeSign</RootNamespace>
@@ -34,6 +35,7 @@
   </ItemGroup>
   <ItemGroup>
     <None Include="App.config" />
+    <None Include="project.json" />
   </ItemGroup>
   <ImportGroup Label="Targets">
     <Import Project="..\..\..\..\build\Targets\VSL.Imports.targets" />

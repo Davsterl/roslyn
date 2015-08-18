@@ -98,7 +98,7 @@
     <Compile Include="VisualBasicResultProviderTestBase.vb" />
   </ItemGroup>
   <ItemGroup>
-    <None Include="packages.config" />
+    <None Include="project.json" />
   </ItemGroup>
   <Import Project="..\..\Source\ResultProvider\BasicResultProvider.projitems" Label="Shared" />
   <ImportGroup Label="Targets">

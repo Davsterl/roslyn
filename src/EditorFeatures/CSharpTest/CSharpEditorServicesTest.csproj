@@ -531,7 +531,7 @@
     <Compile Include="TypeInferrer\TypeInferrerTests.cs" />
     <Compile Include="Workspaces\WorkspaceTests.cs" />
     <None Include="app.config" />
-    <None Include="packages.config" />
+    <None Include="project.json" />
     <None Include="PerfTests\CSharpPerfFindRefs.xml">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </None>

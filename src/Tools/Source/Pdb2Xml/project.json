@@ -1,0 +1,13 @@
+{
+  "dependencies": {
+    "Microsoft.DiaSymReader": "1.0.5",
+    "System.Diagnostics.Debug": "4.0.10-beta-22816",
+    "System.Runtime": "4.0.20-beta-22816"
+  },
+  "frameworks": {
+    "net45": { }
+  },
+  "runtimes": {
+    "win-anycpu": { }
+  }
+}

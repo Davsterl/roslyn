@@ -1,5 +1,6 @@
 {
   "dependencies": {
+    "Microsoft.NETCore.Platforms": "1.0.0",
     "System.AppContext": "4.0.0-beta-23109",
     "System.Console": "4.0.0-beta-23109",
     "System.Collections": "4.0.10-beta-23109",
@@ -38,12 +39,17 @@
     "System.Threading.ThreadPool": "4.0.0-beta-23109",
     "System.Threading.Tasks": "4.0.10-beta-23109",
     "System.Threading.Tasks.Parallel": "4.0.0-beta-23109",
-    "System.Private.Uri": "4.0.0",
     "System.Xml.ReaderWriter": "4.0.10-beta-23109",
     "System.Xml.XDocument": "4.0.10-beta-23109",
-    "System.Xml.XmlDocument": "4.0.0-beta-23109",
+    "System.Xml.XmlDocument": "4.0.0-beta-23109"
   },
   "frameworks": {
-      "dnxcore50": {}
+    "dnxcore50": {
+      "imports": "portable-net452"
+    }
+  },
+  "runtimes": {
+    "win-x86": { },
+    "win-x64": { }
   }
 }

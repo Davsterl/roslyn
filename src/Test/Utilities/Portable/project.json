@@ -1,0 +1,32 @@
+﻿{
+  "supports": {
+    "net46.app": {},
+    "dnxcore50.app": {}
+  },
+  "dependencies": {
+    "System.Collections": "4.0.10-beta-22816",
+    "System.Collections.Immutable": "1.1.36",
+    "System.Console": "4.0.0-beta-22816",
+    "System.Diagnostics.Debug": "4.0.10-beta-22816",
+    "System.Globalization": "4.0.10-beta-22819",
+    "System.IO": "4.0.10-beta-22816",
+    "System.IO.FileSystem": "4.0.0-beta-22816",
+    "System.IO.FileSystem.Primitives": "4.0.0-beta-22816",
+    "System.Reflection": "4.0.10-beta-22816",
+    "System.Runtime": "4.0.20-beta-22816",
+    "System.Runtime.InteropServices": "4.0.20-beta-22816",
+    "System.Runtime.Extensions": "4.0.10-beta-22816",
+    "System.Text.Encoding": "4.0.10-beta-22816",
+    "System.Threading": "4.0.10-beta-22816",
+    "System.Threading.Tasks": "4.0.10-beta-22816",
+    "System.Threading.Thread": "4.0.0-beta-22816",
+    "System.Xml.XDocument": "4.0.10-beta-22816",
+    "System.Xml.XmlDocument": "4.0.0-beta-22816",
+    "xunit": "2.1.0-beta4-build3109"
+  },
+  "frameworks": {
+    "dotnet": {
+      "imports": "portable-net452"
+    }
+  }
+}
