@@ -485,4 +485,13 @@
   <data name="InvalidTree" xml:space="preserve">
     <value>Syntax tree doesn't belong to the underlying 'Compilation'.</value>
   </data>
+  <data name="UnnecessarySuppressionCategory" xml:space="preserve">
+    <value>Suppression</value>
+  </data>
+  <data name="UnnecessarySuppressionMessage" xml:space="preserve">
+    <value>This SuppressMessageAttribute is not suppressing any diagnostics.</value>
+  </data>
+  <data name="UnnecessarySuppressionTitle" xml:space="preserve">
+    <value>SuppressMessageAttribute is unused</value>
+  </data>
 </root>
