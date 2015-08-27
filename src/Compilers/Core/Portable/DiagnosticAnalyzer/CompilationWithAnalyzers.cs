@@ -369,9 +369,18 @@ namespace Microsoft.CodeAnalysis.Diagnostics
             // Compute the analyzer diagnostics for the given analysis scope.
             await ComputeAnalyzerDiagnosticsAsync(analysisScope, generateCompilationEvents, getEventQueue, newTaskToken: 0, cancellationToken: cancellationToken).ConfigureAwait(false);
 
+            var builder = ImmutableArray.CreateBuilder<Diagnostic>();
+            builder.AddRange(diagnostics);
+         
             // Return computed analyzer diagnostics for the given analysis scope.
             var analyzerDiagnostics = _analysisResult.GetDiagnostics(analysisScope, getLocalDiagnostics: includeSourceEvents, getNonLocalDiagnostics: includeNonSourceEvents);
-            return diagnostics.AddRange(analyzerDiagnostics);
+            builder.AddRange(analyzerDiagnostics);
+
+            //Check for UnusedSuppression
+            var unusedDiagnostics = AnalyzerDriver.CheckForUnusedGlobalSuppressions(Compilation);
+            builder.AddRange(unusedDiagnostics);
+            
+            return builder.ToImmutableArray();
         }
 
         /// <summary>
@@ -497,8 +506,9 @@ namespace Microsoft.CodeAnalysis.Diagnostics
                     await ComputeAnalyzerDiagnosticsAsync(analysisScope, generateCompilationEvents, getEventQueue, taskToken, cancellationToken).ConfigureAwait(false);
                 } while (_analysisState.HasPendingSymbolAnalysis(analysisScope));
 
-                // Return computed analyzer diagnostics for the given analysis scope.
-                return _analysisResult.GetDiagnostics(analysisScope, getLocalDiagnostics: true, getNonLocalDiagnostics: false);
+              
+               return _analysisResult.GetDiagnostics(analysisScope, getLocalDiagnostics: true, getNonLocalDiagnostics: false);
+            
             }
             catch (Exception e) when (FatalError.ReportUnlessCanceled(e))
             {
@@ -679,6 +689,7 @@ namespace Microsoft.CodeAnalysis.Diagnostics
                         // Perform analysis to compute new diagnostics.
                         Debug.Assert(!eventQueue.IsCompleted);
                         await driver.AttachQueueAndProcessAllEventsAsync(eventQueue, analysisScope, _analysisState, cancellationToken: cancellationToken).ConfigureAwait(false);
+                        
                     }
                     finally
                     {

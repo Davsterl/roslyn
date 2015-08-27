@@ -366,6 +366,7 @@ namespace Microsoft.CodeAnalysis.Diagnostics
 
             var analysisScope = new AnalysisScope(newCompilation, analyzers, concurrentAnalysis: newCompilation.Options.ConcurrentBuild, categorizeDiagnostics: categorizeDiagnostics);
             analyzerDriver.AttachQueueAndStartProcessingEvents(newCompilation.EventQueue, analysisScope, cancellationToken: cancellationToken);
+           
             return analyzerDriver;
         }
 
@@ -385,6 +386,7 @@ namespace Microsoft.CodeAnalysis.Diagnostics
                 {
                     OnDriverException(this.WhenCompletedTask, this.analyzerExecutor, this.analyzers);
                 }
+                
             }
 
             Diagnostic d;
@@ -531,6 +533,8 @@ namespace Microsoft.CodeAnalysis.Diagnostics
                 if (completedEvent != null)
                 {
                     ProcessEvent(completedEvent, analysisScope, analysisStateOpt, cancellationToken);
+
+                   
                 }
             }
             catch (Exception e) when(FatalError.ReportUnlessCanceled(e))
@@ -721,6 +725,8 @@ namespace Microsoft.CodeAnalysis.Diagnostics
                         analysisStateOpt?.MarkEventComplete(completedEvent, analyzer);
                     }
                 }
+                
+                
             }
             finally
             {
@@ -761,11 +767,33 @@ namespace Microsoft.CodeAnalysis.Diagnostics
                         analysisStateOpt?.MarkEventComplete(compilationEvent, analyzer);
                     }
                 }
+             
             }
             finally
             {
                 compilationEvent.FlushCache();
             }
+        }
+
+
+
+
+         internal static ImmutableArray<Diagnostic> CheckForUnusedGlobalSuppressions(Compilation compilation )
+        {
+            SuppressMessageAttributeState currentSuppressionState = SuppressMessageStateByCompilation.GetValue(compilation, (c) => new SuppressMessageAttributeState(c));
+            var unusedSuppressionAttributes = currentSuppressionState.GetUnSuppressedGlobalAttributes().ToImmutableArray();
+
+            var diagsBuilder = ImmutableArray.CreateBuilder<Diagnostic>() ;
+            foreach(var attribute in unusedSuppressionAttributes)
+            {
+                var diagnostic = UnusedSuppresionDiagnostic.Create(attribute.ApplicationSyntaxReference.GetLocation());
+                diagnostic = GetFilteredDiagnostic(diagnostic,compilation);
+                if(diagnostic != null) { 
+                    diagsBuilder.Add(diagnostic);
+                }
+            }
+            return diagsBuilder.ToImmutableArray();
+           
         }
 
         internal static Action<Diagnostic> GetDiagnosticSinkWithSuppression(Action<Diagnostic> addDiagnosticCore, Compilation compilation, ISymbol symbolOpt = null)
