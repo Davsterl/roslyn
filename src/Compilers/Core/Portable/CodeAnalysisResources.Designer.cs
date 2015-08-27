@@ -1099,6 +1099,33 @@ namespace Microsoft.CodeAnalysis {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to Suppression.
+        /// </summary>
+        internal static string UnnecessarySuppressionCategory {
+            get {
+                return ResourceManager.GetString("UnnecessarySuppressionCategory", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to This SuppressMessageAttribute is not suppressing any diagnostics..
+        /// </summary>
+        internal static string UnnecessarySuppressionMessage {
+            get {
+                return ResourceManager.GetString("UnnecessarySuppressionMessage", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to SuppressMessageAttribute is unused.
+        /// </summary>
+        internal static string UnnecessarySuppressionTitle {
+            get {
+                return ResourceManager.GetString("UnnecessarySuppressionTitle", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to Unresolved: .
         /// </summary>
         internal static string Unresolved {

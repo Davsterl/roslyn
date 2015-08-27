@@ -28,42 +28,113 @@ namespace Microsoft.CodeAnalysis.Diagnostics
         private readonly ConcurrentDictionary<ISymbol, ImmutableArray<string>> _localSuppressionsBySymbol = new ConcurrentDictionary<ISymbol, ImmutableArray<string>>();
         private ISymbol _lazySuppressMessageAttribute;
 
-        private class GlobalSuppressions
+        internal class GlobalSuppressions
         {
-            private readonly HashSet<string> _compilationWideSuppressions = new HashSet<string>();
-            private readonly Dictionary<ISymbol, ImmutableArray<string>> _globalSymbolSuppressions = new Dictionary<ISymbol, ImmutableArray<string>>();
-
-            public void AddCompilationWideSuppression(string id)
+            private object _lock = new object();
+            //Links the SuppressedRule to the suppressingattribute
+            private class GlobalSuppression
             {
-                _compilationWideSuppressions.Add(id);
+                internal string SuppressedRule;
+                internal ImmutableArray<AttributeData> Attributes;
+                internal bool isTyped = false;
+                
+
+                public GlobalSuppression(string suppressedRule, ImmutableArray<AttributeData> ImmutableArray,bool isTyped)
+                {
+                    this.SuppressedRule = suppressedRule;
+                    this.Attributes = ImmutableArray;
+                    this.isTyped = isTyped;
+                }
+            }
+            private readonly List<GlobalSuppression> _compilationWideSuppressions = new List<GlobalSuppression>();
+            private readonly Dictionary<ISymbol, ImmutableArray<GlobalSuppression>> _globalSymbolSuppressions = new Dictionary<ISymbol, ImmutableArray<GlobalSuppression>>();
+            private readonly Dictionary<AttributeData, bool> _suppressedAttributes = new Dictionary<AttributeData, bool>();
+            public void AddCompilationWideSuppression(string id,AttributeData attribute)
+            {
+                lock (_lock) { 
+                    var rule = _compilationWideSuppressions.FirstOrDefault(s => s.SuppressedRule == id);
+                    if(rule != null)
+                    {
+                        rule.Attributes = rule.Attributes.Add(attribute);
+                    }
+                    else
+                    {
+                        _compilationWideSuppressions.Add(new GlobalSuppression(id, ImmutableArray.Create(attribute),false));
+                    }
+                    _suppressedAttributes.Add(attribute, false);
+                }
             }
 
-            public void AddGlobalSymbolSuppression(ISymbol symbol, string id)
+            public void AddBadSuppressionAttribute(AttributeData attribute)
             {
-                ImmutableArray<string> suppressions;
-                if (_globalSymbolSuppressions.TryGetValue(symbol, out suppressions))
+                _suppressedAttributes.Add(attribute,false);
+            }
+
+            public void AddGlobalSymbolSuppression(ISymbol symbol, string id, AttributeData attribute)
+            {
+                lock (_lock)
                 {
-                    if (!suppressions.Contains(id))
+                    ImmutableArray<GlobalSuppression> suppressions;
+                    if (_globalSymbolSuppressions.TryGetValue(symbol, out suppressions))
                     {
-                        _globalSymbolSuppressions[symbol] = suppressions.Add(id);
+                        var rule = suppressions.FirstOrDefault(s => s.SuppressedRule == id);
+                        if (rule == null)
+                        {
+                            _globalSymbolSuppressions[symbol] = suppressions.Add(new GlobalSuppression(id, ImmutableArray.Create(attribute),true));
+                        }
+                        else
+                        {
+                            //ensure we're tracking all attributes associated with this suppression
+                            rule.Attributes = rule.Attributes.Add(attribute);
+                        }
                     }
-                }
-                else
-                {
-                    _globalSymbolSuppressions.Add(symbol, ImmutableArray.Create(id));
+                    else
+                    {
+                        _globalSymbolSuppressions.Add(symbol, ImmutableArray.Create(new GlobalSuppression(id, ImmutableArray.Create(attribute),true)));
+                    }
+
+                    _suppressedAttributes.Add(attribute, false);
                 }
             }
 
             public bool HasCompilationWideSuppression(string id)
             {
-                return _compilationWideSuppressions.Contains(id);
+                var rule = _compilationWideSuppressions.FirstOrDefault((s) => s.SuppressedRule == id);
+                if (rule != null)
+                {
+                    if (!rule.isTyped) { 
+                        foreach (var attribute in rule.Attributes)
+                        {
+                            _suppressedAttributes[attribute] = true;
+                        }
+                    }
+                    return true;
+                }
+                return false;
             }
 
             public bool HasGlobalSymbolSuppression(ISymbol symbol, string id)
             {
                 Debug.Assert(symbol != null);
-                ImmutableArray<string> suppressions;
-                return _globalSymbolSuppressions.TryGetValue(symbol, out suppressions) && suppressions.Contains(id);
+                ImmutableArray<GlobalSuppression> suppressions;
+                if(_globalSymbolSuppressions.TryGetValue(symbol, out suppressions) && suppressions.Contains(sup=>sup.SuppressedRule == id))
+                {
+                    foreach(var attribute in suppressions.FirstOrDefault(sup=>sup.SuppressedRule == id).Attributes)
+                    {
+                        _suppressedAttributes[attribute] = true;
+                    }
+                    return true;
+                }
+                return false;
+            }
+            public IEnumerable<AttributeData> GetUnusedSuppressors()
+            {
+                IEnumerable<AttributeData> attributes;
+                lock (_lock)
+                {
+                    attributes = _suppressedAttributes.Where(kv => kv.Value == false).Select(sup => sup.Key);
+                }
+                return attributes;
             }
         }
 
@@ -166,6 +237,12 @@ namespace Microsoft.CodeAnalysis.Diagnostics
                 symbolOpt != null && _lazyGlobalSuppressions.HasGlobalSymbolSuppression(symbolOpt, id);
         }
 
+        internal IEnumerable<AttributeData> GetUnSuppressedGlobalAttributes()
+        {
+            this.DecodeGlobalSuppressMessageAttributes();
+            return _lazyGlobalSuppressions.GetUnusedSuppressors();
+        }
+
         private bool IsDiagnosticLocallySuppressed(string id, ISymbol symbol)
         {
             var suppressions = _localSuppressionsBySymbol.GetOrAdd(symbol, this.DecodeSuppressMessageAttributes);
@@ -227,6 +304,7 @@ namespace Microsoft.CodeAnalysis.Diagnostics
 
             foreach (var instance in attributeInstances)
             {
+
                 SuppressMessageInfo info;
                 if (!TryDecodeSuppressMessageAttributeData(instance, out info))
                 {
@@ -241,25 +319,33 @@ namespace Microsoft.CodeAnalysis.Diagnostics
                     if ((scope == TargetScope.Module || scope == TargetScope.None) && info.Target == null)
                     {
                         // This suppression is applies to the entire compilation
-                        globalSuppressions.AddCompilationWideSuppression(info.Id);
+                        globalSuppressions.AddCompilationWideSuppression(info.Id,instance);
                         continue;
                     }
                 }
                 else
                 {
                     // Invalid value for scope
+                    globalSuppressions.AddBadSuppressionAttribute(instance);
                     continue;
                 }
 
                 // Decode Target
                 if (info.Target == null)
                 {
+                    globalSuppressions.AddBadSuppressionAttribute(instance);
                     continue;
                 }
-
-                foreach (var target in ResolveTargetSymbols(compilation, info.Target, scope))
+                var collectionOfTargetSymbols = ResolveTargetSymbols(compilation, info.Target, scope);
+                if(collectionOfTargetSymbols.Count() > 0) { 
+                    foreach (var target in ResolveTargetSymbols(compilation, info.Target, scope))
+                    {
+                        globalSuppressions.AddGlobalSymbolSuppression(target, info.Id,instance);
+                    }
+                }
+                else
                 {
-                    globalSuppressions.AddGlobalSymbolSuppression(target, info.Id);
+                    globalSuppressions.AddBadSuppressionAttribute(instance);
                 }
             }
         }

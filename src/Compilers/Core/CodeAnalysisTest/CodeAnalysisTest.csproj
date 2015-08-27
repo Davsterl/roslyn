@@ -27,6 +27,7 @@
     <Compile Include="Collections\BoxesTest.cs" />
     <Compile Include="Collections\ByteSequenceComparerTests.cs" />
     <Compile Include="Diagnostics\DiagnosticLocalizationTests.cs" />
+    <Compile Include="Diagnostics\UnusedSuppressMessageTests.cs" />
     <Compile Include="Emit\EmitOptionsTests.cs" />
     <Compile Include="Emit\CustomDebugInfoTests.cs" />
     <Compile Include="InternalUtilities\StringExtensionsTests.cs" />
