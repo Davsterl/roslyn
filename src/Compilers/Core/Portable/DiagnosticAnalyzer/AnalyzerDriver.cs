@@ -365,8 +365,7 @@ namespace Microsoft.CodeAnalysis.Diagnostics
             analyzerDriver.Initialize(newCompilation, analysisOptions, categorizeDiagnostics, cancellationToken);
 
             var analysisScope = new AnalysisScope(newCompilation, analyzers, concurrentAnalysis: newCompilation.Options.ConcurrentBuild, categorizeDiagnostics: categorizeDiagnostics);
-            analyzerDriver.AttachQueueAndStartProcessingEvents(newCompilation.EventQueue, analysisScope, cancellationToken: cancellationToken);
-           
+            analyzerDriver.AttachQueueAndStartProcessingEvents(newCompilation.EventQueue, analysisScope, cancellationToken: cancellationToken);           
             return analyzerDriver;
         }
 
@@ -385,8 +384,7 @@ namespace Microsoft.CodeAnalysis.Diagnostics
                 if (this.WhenCompletedTask.IsFaulted)
                 {
                     OnDriverException(this.WhenCompletedTask, this.analyzerExecutor, this.analyzers);
-                }
-                
+                }                
             }
 
             Diagnostic d;
@@ -532,9 +530,7 @@ namespace Microsoft.CodeAnalysis.Diagnostics
                 // Finally process the compilation completed event, if any.
                 if (completedEvent != null)
                 {
-                    ProcessEvent(completedEvent, analysisScope, analysisStateOpt, cancellationToken);
-
-                   
+                    ProcessEvent(completedEvent, analysisScope, analysisStateOpt, cancellationToken);   
                 }
             }
             catch (Exception e) when(FatalError.ReportUnlessCanceled(e))
@@ -724,9 +720,7 @@ namespace Microsoft.CodeAnalysis.Diagnostics
                     {
                         analysisStateOpt?.MarkEventComplete(completedEvent, analyzer);
                     }
-                }
-                
-                
+                }    
             }
             finally
             {
@@ -766,8 +760,7 @@ namespace Microsoft.CodeAnalysis.Diagnostics
                     {
                         analysisStateOpt?.MarkEventComplete(compilationEvent, analyzer);
                     }
-                }
-             
+                }     
             }
             finally
             {
@@ -775,10 +768,7 @@ namespace Microsoft.CodeAnalysis.Diagnostics
             }
         }
 
-
-
-
-         internal static ImmutableArray<Diagnostic> CheckForUnusedGlobalSuppressions(Compilation compilation )
+        internal static ImmutableArray<Diagnostic> CheckForUnusedGlobalSuppressions(Compilation compilation )
         {
             SuppressMessageAttributeState currentSuppressionState = SuppressMessageStateByCompilation.GetValue(compilation, (c) => new SuppressMessageAttributeState(c));
             var unusedSuppressionAttributes = currentSuppressionState.GetUnSuppressedGlobalAttributes().ToImmutableArray();

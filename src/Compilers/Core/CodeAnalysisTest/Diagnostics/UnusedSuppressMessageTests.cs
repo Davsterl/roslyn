@@ -32,6 +32,7 @@ class C1
                 Diagnostic("RS9000",new LinePosition(1,11)));
         }
 
+        [Fact]
         public void UnusedSuppressionBasicOnType_NoDiag()
         {
             VerifyCSharp(@"
@@ -47,6 +48,7 @@ class C1
                 DiagnosticDescription.None);
         }
 
+        [Fact]
         public void UnusedGlobalSuppression_NoError()
         {
             VerifyCSharp(@"
@@ -62,6 +64,7 @@ class C1
                 DiagnosticDescription.None);
         }
 
+        [Fact]
         public void UnusedGlobalSuppression()
         {
             VerifyCSharp(@"
@@ -77,21 +80,7 @@ class C1
                 Diagnostic("RS9000", new LinePosition(1, 11)));
         }
 
-        public void UnusedGlobalSuppression()
-        {
-            VerifyCSharp(@"
-[assembly: System.Diagnostics.CodeAnalysis.SuppressMessage(""Test"", ""CS0"")]
-class C1
-        {
-            public void A()
-            {
-                int i;
-            }
-        }
-",
-                Diagnostic("RS9000", new LinePosition(1, 11)));
-        }
-
+        [Fact]
         public void UnusedGlobalSuppression_Module()
         {
             VerifyCSharp(@"
@@ -107,6 +96,7 @@ class C1
                 Diagnostic("RS9000", new LinePosition(1, 9)));
         }
 
+        [Fact]
         public void UnusedGlobalSuppression_TwoMessages()
         {
             VerifyCSharp(@"
@@ -124,6 +114,7 @@ class C1
                 Diagnostic("RS9000", new LinePosition(2, 11)));
         }
 
+        [Fact]
         public void UnusedSuppressionOnType_MissingScope()
         {
             VerifyCSharp(@"
@@ -142,11 +133,11 @@ class C1
 
         #endregion
 
-        VerifyCSharp(string Source, params DiagnosticDescription[] Expected)
+        private void VerifyCSharp(string Source, params DiagnosticDescription[] Expected)
         {
             var compilation = CreateCompilation(Source, LanguageNames.CSharp, null);
             var UnusedDiagnostics = AnalyzerDriver.CheckForUnusedGlobalSuppressions(compilation);
-            UnusedDiagnostics.Verify(expected);
+            UnusedDiagnostics.Verify(Expected);
         }
 
         private static Compilation CreateCompilation(string source, string language, string rootNamespace)

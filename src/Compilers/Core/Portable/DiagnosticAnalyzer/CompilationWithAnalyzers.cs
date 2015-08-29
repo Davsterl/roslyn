@@ -505,10 +505,8 @@ namespace Microsoft.CodeAnalysis.Diagnostics
                 {
                     await ComputeAnalyzerDiagnosticsAsync(analysisScope, generateCompilationEvents, getEventQueue, taskToken, cancellationToken).ConfigureAwait(false);
                 } while (_analysisState.HasPendingSymbolAnalysis(analysisScope));
-
-              
-               return _analysisResult.GetDiagnostics(analysisScope, getLocalDiagnostics: true, getNonLocalDiagnostics: false);
-            
+    
+               return _analysisResult.GetDiagnostics(analysisScope, getLocalDiagnostics: true, getNonLocalDiagnostics: false);            
             }
             catch (Exception e) when (FatalError.ReportUnlessCanceled(e))
             {
@@ -688,8 +686,7 @@ namespace Microsoft.CodeAnalysis.Diagnostics
                     {
                         // Perform analysis to compute new diagnostics.
                         Debug.Assert(!eventQueue.IsCompleted);
-                        await driver.AttachQueueAndProcessAllEventsAsync(eventQueue, analysisScope, _analysisState, cancellationToken: cancellationToken).ConfigureAwait(false);
-                        
+                        await driver.AttachQueueAndProcessAllEventsAsync(eventQueue, analysisScope, _analysisState, cancellationToken: cancellationToken).ConfigureAwait(false);    
                     }
                     finally
                     {

@@ -11,7 +11,7 @@ namespace Microsoft.CodeAnalysis
         private static readonly LocalizableString s_localizableMessage = new LocalizableResourceString(nameof(CodeAnalysisResources.UnnecessarySuppressionMessage), CodeAnalysisResources.ResourceManager, typeof(CodeAnalysisResources));
 
         private static readonly LocalizableString s_localizableTitleUnnecessarySuppression = new LocalizableResourceString(nameof(CodeAnalysisResources.UnnecessarySuppressionTitle), CodeAnalysisResources.ResourceManager, typeof(CodeAnalysisResources));
-        private static readonly LocalizableString s_localizableCategory = new LocalizableString(nameof(CodeAnalysisResources.UnnecessarySuppressionCategory), CodeAnalysisResources.ResourceManager, typeof(CodeAnalysisResources));
+        private static readonly LocalizableString s_localizableCategory = new LocalizableResourceString(nameof(CodeAnalysisResources.UnnecessarySuppressionCategory), CodeAnalysisResources.ResourceManager, typeof(CodeAnalysisResources));
         private static readonly DiagnosticDescriptor s_descriptorUnnecessarySuppression = new DiagnosticDescriptor("RS9000",
                                                                     s_localizableTitleUnnecessarySuppression.ToString(),
                                                                     s_localizableMessage.ToString(),
